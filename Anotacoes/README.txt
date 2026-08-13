@@ -1,0 +1,1 @@
+Nessa pasta estão todas as anotações de aulas e afins relacionados a matéria.

@@ -1,0 +1,1 @@
+Nessa pasta estão todas os projetos, exercícios e afins relacionados a matéria.
