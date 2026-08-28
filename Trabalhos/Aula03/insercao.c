@@ -4,7 +4,7 @@
 
 #include "exercicio.h"
 
-void insercao(arquivos_t *arquivos) {
+void insercao() {
     registro_t registro = {0};
 
     printf("Insira o CPF da pessoa (apenas números)\n> ");
@@ -22,61 +22,78 @@ void insercao(arquivos_t *arquivos) {
     printf("\nInsira a Cidade da pessoa\n> ");
     scanf(" %"STR_SIZE_S"[^\n]s", &registro.cidade);
 
-    if(arquivos->cli != NULL) fclose(arquivos->cli);
-    arquivos->cli = fopen("temp.bin", "rb");
-    if(arquivos->tmp != NULL) fclose(arquivos->tmp);
-    arquivos->tmp = fopen("temp.bin", "wb");
+    FILE *clientes = fopen("clientes.bin", "r+b");
+    FILE *temp = fopen("temp.bin", "wb");
+    if(clientes == NULL || temp == NULL) {
+        err(1, "Houve um erro na abertura dos arquivos");
+    }
+
+    int pos = ftell(clientes);
+    fseek(clientes, 0, SEEK_END);
+    int endpos = ftell(clientes);
+    if(pos == ftell(clientes)) {
+        fprintf(
+            clientes, "%lld|%s|%s|%s|%s|",
+            registro.cpf, registro.nome, registro.sobrenome,
+            registro.telefone, registro.cidade
+        );
+
+        fclose(clientes);
+        fclose(temp);
+
+        printf("Cliente adicionado ao sistema!\n\n");
+        return;
+    }
+
+
+    fseek(clientes, 0, SEEK_SET);
 
     long long cpf = 0;
-    char buf[STR_SIZE];
-    while(feof(arquivos->cli) != 0) {
-        fscanf(arquivos->cli, "%lld", &cpf);
-        if(cpf >= registro.cpf) break;
+    char c = '\0';
+    while(ftell(clientes) != endpos) {
+        fscanf(clientes, "%lld", &cpf);
+        if(cpf >= registro.cpf) {
+            fprintf(
+                temp, "%lld|%s|%s|%s|%s|%lld",
+                registro.cpf, registro.nome, registro.sobrenome,
+                registro.telefone, registro.cidade, cpf
+            );
 
-        // Escrever CPF
-        fprintf(arquivos->tmp, "%lld|", cpf);
-        fseek(arquivos->cli, 1, SEEK_CUR);
+            goto exit;
+        }
 
-        // Escrever Nome
-        fscanf(arquivos->cli, "%"STR_SIZE_S"[^|]s", &buf);
-        fprintf(arquivos->tmp, "%s|", buf);
-        fseek(arquivos->cli, 1, SEEK_CUR);
+        fprintf(temp, "%lld", cpf);
 
-        // Escrever Sobrenome
-        fscanf(arquivos->cli, "%"STR_SIZE_S"[^|]s", &buf);
-        fprintf(arquivos->tmp, "%s|", buf);
-        fseek(arquivos->cli, 1, SEEK_CUR);
-
-        // Escrever Telefone
-        fscanf(arquivos->cli, "%"STR_SIZE_S"[^|]s", &buf);
-        fprintf(arquivos->tmp, "%s|", buf);
-        fseek(arquivos->cli, 1, SEEK_CUR);
-
-        // Escrever Cidade
-        fscanf(arquivos->cli, "%"STR_SIZE_S"[^|]s", &buf);
-        fprintf(arquivos->tmp, "%s|", buf);
-        fseek(arquivos->cli, 1, SEEK_CUR);
-
-        printf("%d\n", ftell(arquivos->cli));
+        for(int i = 0; i < 5;) {
+            if((c = getc(clientes)) == EOF) break;
+            if(c == '|') i++;
+            putc(c, temp);
+        }
     }
 
     fprintf(
-        arquivos->tmp, "%lld|%s|%s|%s|%s|",
-        registro.cpf, registro.nome,
-        registro.sobrenome, registro.telefone,
-        registro.cidade
+        temp, "%lld|%s|%s|%s|%s",
+        registro.cpf, registro.nome, registro.sobrenome,
+        registro.telefone, registro.cidade
     );
 
-    char c = '\0';
-    while((c = fgetc(arquivos->cli)) != EOF) 
-        fputc(c, arquivos->tmp);
+    exit: 
 
-    fclose(arquivos->cli);
-    arquivos->cli = fopen("temp.bin", "wb");
-    fclose(arquivos->tmp);
-    arquivos->tmp = fopen("temp.bin", "rb");
+    while((c = getc(clientes)) != EOF) {
+        putc(c, temp);
+    }
 
-    while((c = fgetc(arquivos->tmp)) != EOF)
-        fputc(c, arquivos->cli);
+    fclose(clientes);
+    fclose(temp);
 
+    clientes = fopen("clientes.bin", "wb");
+    temp = fopen("temp.bin", "rb");
+
+    while((c = getc(temp)) != EOF)
+        putc(c, clientes);
+
+    fclose(clientes);
+    fclose(temp);
+
+    printf("Cliente adicionado ao sistema!\n\n");
 }

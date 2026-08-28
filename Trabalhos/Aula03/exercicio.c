@@ -4,12 +4,11 @@
 #include "exercicio.h"
 
 int main(void) {
-    arquivos_t arquivos = {0};
-
-    arquivos.cli = fopen("clientes.bin", "a+b");
-    arquivos.tmp = fopen("temp.bin", "a+b");
-    if(arquivos.cli == NULL || arquivos.tmp == NULL) {
-        err(1, "Erro na abertura de arquivos");
+    // Assegura que os arquivos essenciais existem
+    FILE *clientes = fopen("clientes.bin", "a");
+    FILE *temp     = fopen("temp.bin", "a");
+    if(clientes == NULL || temp == NULL) {
+        err(1, "Arquivos essenciais não puderam ser criados.");
     }
 
     int opcao = -1;
@@ -32,7 +31,16 @@ int main(void) {
                 break;
             case 0: break;
             case 1:
-                insercao(&arquivos);
+                insercao();
+                break;
+            case 2:
+                remocao();
+                break;
+            case 3:
+                atualizacao();
+                break;
+            case 4:
+                busca();
                 break;
         }
     }
