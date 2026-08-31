@@ -4,6 +4,8 @@
 
 #include "exercicio.h"
 
+// Implementação extremamente básica de um vetor dinâmicamente alocado para armazenar
+// os ponteiros de localização
 typedef struct vetor {
     size_t capacidade;
     size_t tamanho;
@@ -27,6 +29,7 @@ void busca() {
         err(1, "Houve um erro na abertura dos arquivos");
     }
 
+    // Criação do vetor para armazenar os ponteiros
     vetor_t vetor = {
         .capacidade = 8,
         .tamanho = 0,
@@ -37,6 +40,9 @@ void busca() {
         err(1, "Erro na alocação de memória");
     }
 
+    // Percorre o vetor, contando o número de caracteres '|'.
+    // No caso do número de "pipes" ser um múltiplo exato de 5,
+    // e de não ter sido inserido ainda no vetor, insira o atual índice
     int pipes = 0;
     char c = '\0';
     while((c = getc(clientes)) != EOF) {
@@ -56,14 +62,18 @@ void busca() {
         return;
     }
 
+    // Obtém o CPF sendo procurado
     long long cpf_bus = 0;
     printf("Insira o CPF da pessoa (apenas números)\n> ");
     scanf(" %lld", &cpf_bus);
 
+    // Busca binária pelo vetor
     int ls = 0, rs = vetor.tamanho, achado = 0;
     long long cpf = 0;
     while(1) {
         if(rs <= ls) break;
+
+        // Mova o ponteiro do arquivo para a posição inicial do registro
         fseek(clientes, vetor.arr[(ls + rs) / 2], SEEK_SET);
         fscanf(clientes, "%lld", &cpf);
 
@@ -82,6 +92,8 @@ void busca() {
         printf("Cliente não encontrado.\n\n");
         return;
     } else {
+
+        // Obtém as informações do registro do arquivo e imprime-as no terminal
         fseek(clientes, vetor.arr[(ls+rs) / 2], SEEK_SET);
         registro_t registro = {0};
 

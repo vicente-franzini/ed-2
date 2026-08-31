@@ -4,13 +4,15 @@
 #include "exercicio.h"
 
 int main(void) {
-    // Assegura que os arquivos essenciais existem
+    // Abrir arquivos no modo "append" garante que caso eles não existam,
+    // eles sejam criados. E, caso eles existam, não apaguem eles.
     FILE *clientes = fopen("clientes.bin", "a");
     FILE *temp     = fopen("temp.bin", "a");
     if(clientes == NULL || temp == NULL) {
         err(1, "Arquivos essenciais não puderam ser criados.");
     }
 
+    // Menu básico, chama as funções devidas, definidas em "exercicio.h"
     int opcao = -1;
     while(opcao != 0) {
         printf(
@@ -41,6 +43,9 @@ int main(void) {
                 break;
             case 4:
                 busca();
+                break;
+            case 5:
+                merge();
                 break;
         }
     }
