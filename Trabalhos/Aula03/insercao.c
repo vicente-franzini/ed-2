@@ -17,7 +17,7 @@ void insercao() {
     registro_t registro = {0};
 
     printf("Insira o CPF da pessoa (apenas números)\n> ");
-    scanf(" %lld", &registro.cpf);
+    scanf(" %011lld", &registro.cpf);
 
     printf("\nInsira o Nome da pessoa\n> ");
     scanf(" %"STR_SIZE_S"[^\n]s", &registro.nome);
