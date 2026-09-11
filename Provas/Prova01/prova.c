@@ -48,13 +48,13 @@ int main() {
                 insercao();
                 break;
             case 2:
-                //remocao();
+                remocao();
                 break;
             case 3:
                 //compactacao();
                 break;
             case 4:
-                //dump();
+                dump();
                 break;
             case 5:
                 //carrega();

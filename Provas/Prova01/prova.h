@@ -18,6 +18,7 @@ typedef struct registro {
 } registro_t;
 
 int insercao();
+int insercao_r(registro_t *reg);
 int remocao();
 int compactacao();
 int dump();

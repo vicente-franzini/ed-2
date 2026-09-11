@@ -4,10 +4,6 @@
 #include "prova.h"
 
 int insercao() {
-    FILE *db = fopen("db.bin", "r+b");
-    if(db == NULL)
-        return -1;
-
     registro_t reg = {0};
 
     printf("Insira o código da faixa (APENAS 4 CARACTERES)\n> ");
@@ -27,8 +23,36 @@ int insercao() {
     reg.tamanho += strlen(reg.artista);
     reg.tamanho += strlen(reg.genero);
 
+    return insercao_r(&reg);
+}
+
+int insercao_r(registro_t *reg) {
+    FILE *db = fopen("db.bin", "r+b");
+    if(db == NULL)
+        return -1;
+
     int32_t tam_atual;
-    int32_t diff = INT32_MAX, diff_i = -1, diff_t = reg.tamanho;
+    char cod_atual[5];
+    for(;;) {
+        fread(&tam_atual, sizeof(int32_t), 1, db);
+        if(tam_atual == -1) break;
+        if(tam_atual < 0) {
+            fseek(db, -tam_atual, SEEK_CUR);
+            continue;
+        }
+
+        fscanf(db, "%4[^|]s", cod_atual);
+        if(strcmp(cod_atual, reg->codigo) == 0) {
+            printf("Um registro com esse código já existe!\n\n");
+            fclose(db);
+            return -1;
+        }
+
+        fseek(db, tam_atual - 4, SEEK_CUR);
+    }
+    fseek(db, 0, SEEK_SET);
+
+    int32_t diff = INT32_MAX, diff_i = -1, diff_t = reg->tamanho;
     for(;;) {
         fread(&tam_atual, sizeof(int32_t), 1, db);
         if(tam_atual == -1) break;
@@ -39,10 +63,10 @@ int insercao() {
 
         tam_atual = -tam_atual;
         if(
-            tam_atual >= reg.tamanho && 
-            tam_atual - reg.tamanho < diff
+            tam_atual >= reg->tamanho && 
+            tam_atual - reg->tamanho < diff
         ) {
-            diff = tam_atual - reg.tamanho;
+            diff = tam_atual - reg->tamanho;
             diff_i = ftell(db);
             diff_t = tam_atual;
         }
@@ -58,12 +82,11 @@ int insercao() {
     fwrite(&diff_t, sizeof(int32_t), 1, db);
     fprintf(
         db, "%s|%s|%s|%s|",
-        reg.codigo, reg.faixa, reg.artista, reg.genero
+        reg->codigo, reg->faixa, reg->artista, reg->genero
     );
 
     if(diff_i == -1) fwrite(&diff_i, sizeof(int32_t), 1, db);
     fclose(db);
 
     printf("Registro inserido com sucesso!\n\n");
-
 }
