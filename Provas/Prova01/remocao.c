@@ -4,13 +4,17 @@
 #include "prova.h"
 
 int remocao() {
-    FILE *db = fopen("db.bin", "r+b");
-    if(db == NULL)
-        return -1;
-
     char codigo[5];
     printf("Insira o código do registro a ser deletado:\n> ");
     scanf(" %4s", &codigo);
+
+    return remocao_c(codigo);
+}
+
+int remocao_c(char *codigo) {
+    FILE *db = fopen("db.bin", "r+b");
+    if(db == NULL)
+        return -1;
 
     int32_t tam_atual;
     char cod_atual[5];
@@ -36,6 +40,8 @@ int remocao() {
 
     if(tam_atual == -1) {
         printf("Um registro com esse código não foi encontrado.\n\n");
+        fclose(db);
+        return -13;
     } else {
         printf("Registro deletado com sucesso!\n\n");
     }
@@ -43,5 +49,4 @@ int remocao() {
     fclose(db);
 
     return 0;
-
 }

@@ -33,7 +33,8 @@ int main() {
             " (2) Remoção\n"
             " (3) Compactação\n"
             " (4) Dump\n"
-            " (5) Carrega\n\n"
+            " (5) Carrega (insere)\n"
+            " (6) Carrega (remove)\n\n"
             "> "
         );
 
@@ -51,13 +52,16 @@ int main() {
                 remocao();
                 break;
             case 3:
-                //compactacao();
+                compactacao();
                 break;
             case 4:
                 dump();
                 break;
             case 5:
-                //carrega();
+                carrega_i();
+                break;
+            case 6:
+                carrega_r();
                 break;
         }
     }

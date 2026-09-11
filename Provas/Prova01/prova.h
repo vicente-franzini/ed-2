@@ -20,8 +20,10 @@ typedef struct registro {
 int insercao();
 int insercao_r(registro_t *reg);
 int remocao();
+int remocao_c(char *codigo);
 int compactacao();
 int dump();
-int carrega();
+int carrega_i();
+int carrega_r();
 
 #endif
