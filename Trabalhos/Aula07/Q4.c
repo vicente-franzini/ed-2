@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 struct RLE_Chunk {
+    char magic;
     unsigned char n;
     char c;
 };
@@ -19,6 +20,7 @@ int main() {
     assert(bin != NULL);
 
     struct RLE_Chunk chunk = {
+        .magic = '\0',
         .n = 1,
         .c = buffer[0]
     };
@@ -30,25 +32,31 @@ int main() {
             continue;
         }
 
-        fwrite(&chunk, sizeof(struct RLE_Chunk), 1, bin);
+        if(chunk.n >= 3) {
+            fwrite(&chunk, sizeof(struct RLE_Chunk), 1, bin);  
+        }
+        else if(chunk.n == 2) fprintf(bin, "%c%c", chunk.c, chunk.c);
+        else fputc(chunk.c, bin);
+
         chunk.c = buffer[i];
-        chunk.n = 1;
+        chunk.n = 1;  
     }
-
-    chunk.c = '\0';
-    chunk.n = 255;
-    fwrite(&chunk, sizeof(struct RLE_Chunk), 1, bin);
-
 
     /* Decode de rle.bin para o terminal */
     fseek(bin, 0, SEEK_SET);
+    char c;
 
-    for(
+    unsigned char n;
+    while((c = fgetc(bin)) != EOF) {
+        if(c != '\0') {
+            putchar(c);
+            continue;
+        }
+        
+        fseek(bin, -1, SEEK_CUR);
         fread(&chunk, sizeof(struct RLE_Chunk), 1, bin);
-        chunk.c != '\0';
-        fread(&chunk, sizeof(struct RLE_Chunk), 1, bin)
-    ) {
-        printf("%d:%c ", chunk.n, chunk.c);
+
+        while(chunk.n--) putchar(chunk.c);
     }
 
     putchar('\n');
