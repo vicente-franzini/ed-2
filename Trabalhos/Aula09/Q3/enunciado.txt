@@ -1,0 +1,6 @@
+Em código C, faça structs que permitam a
+construção de uma árvore B e uma função de
+alocação de um nó.
+
+BONUS: Faça funções para inicialização, busca,
+inserção e remoção na árvore B.
